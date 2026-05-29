@@ -1,0 +1,36 @@
+name: mustang-monitor
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # every 30 min (public repo = unlimited minutes)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write   # allow committing state/monitor.db back
+
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - name: Run monitor
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python -m mustang_monitor.run
+      - name: Persist state
+        run: |
+          git config user.name "mustang-monitor-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add state/monitor.db
+          git diff --cached --quiet || git commit -m "chore: update monitor state [skip ci]"
+          git push
