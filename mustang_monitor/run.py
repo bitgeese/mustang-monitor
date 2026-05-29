@@ -17,7 +17,11 @@ SITE_MODULES = {"otomoto": otomoto, "olx": olx, "mobilede": mobilede,
                 "autoscout24": autoscout24, "willhaben": willhaben}
 
 def process_listing(listing: Listing, spec: dict, conn, vin_decoder, scorer) -> dict:
-    """Run one listing through the pipeline. Returns a decision dict (no I/O side effects except state)."""
+    """Run one listing through the pipeline and return a decision dict.
+
+    Writes to `conn` unconditionally (mark_seen / cache_vin commit), so callers
+    must pass a throwaway/in-memory conn for dry-runs to avoid polluting state.
+    """
     ok, reasons = passes_hard_filters(listing, spec)
     if not ok:
         return {"action": "drop", "reasons": reasons}
@@ -64,8 +68,12 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
 
     spec = load_spec(Path(args.spec))
-    Path(args.db).parent.mkdir(parents=True, exist_ok=True)
-    conn = open_db(args.db)
+    # Dry-run uses a throwaway in-memory db so it never marks listings seen
+    # (which would silently suppress a later real run's alerts).
+    db_path = ":memory:" if args.dry_run else args.db
+    if not args.dry_run:
+        Path(args.db).parent.mkdir(parents=True, exist_ok=True)
+    conn = open_db(db_path)
 
     token = os.environ.get("TELEGRAM_TOKEN", "")
     chat_id = os.environ.get("TELEGRAM_CHAT_ID", "")

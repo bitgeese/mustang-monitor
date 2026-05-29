@@ -45,7 +45,8 @@ def test_process_new_match_alerts(tmp_path):
 def test_process_seen_is_skipped_second_time(tmp_path):
     conn = open_db(tmp_path / "m.db")
     scorer = lambda l: {"match_score": 80, "ai_unscored": False, "red_flags": []}
-    process_listing(_mk(), SPEC, conn, vin_decoder=lambda v: {}, scorer=scorer)
+    first = process_listing(_mk(), SPEC, conn, vin_decoder=lambda v: {}, scorer=scorer)
+    assert first["action"] == "alert"
     decision = process_listing(_mk(), SPEC, conn, vin_decoder=lambda v: {}, scorer=scorer)
     assert decision["action"] == "skip"
 
@@ -56,3 +57,21 @@ def test_process_vin_disqualifies(tmp_path):
                                scorer=lambda l: {"match_score": 90, "ai_unscored": False})
     assert decision["action"] == "drop"
     assert any("displacement" in r or "cylinders" in r for r in decision["reasons"])
+
+def test_main_dry_run_prints_and_does_not_persist(tmp_path, monkeypatch, capsys):
+    from pathlib import Path
+    from mustang_monitor import run as run_mod
+    # Avoid network/AI: stub the per-site fetch and the scorer; restrict to one site.
+    monkeypatch.setattr(run_mod, "enabled_sites", lambda spec: ["otomoto"])
+    monkeypatch.setattr(run_mod, "_gather", lambda site, spec, client: [_mk()])
+    monkeypatch.setattr(run_mod.score_ai, "score_listing",
+                        lambda l, client: {"match_score": 90, "ai_unscored": False,
+                                           "red_flags": [], "recommendation": "strong"})
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("TELEGRAM_TOKEN", raising=False)
+    spec_path = Path(__file__).parent.parent / "config" / "spec.yaml"
+    real_db = tmp_path / "real.db"
+    rc = run_mod.main(["--dry-run", "--spec", str(spec_path), "--db", str(real_db)])
+    assert rc == 0
+    assert not real_db.exists()  # dry-run must NOT create/persist the real db
+    assert "Mustang" in capsys.readouterr().out  # printed a would-be alert
