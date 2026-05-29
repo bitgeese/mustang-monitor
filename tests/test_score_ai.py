@@ -34,3 +34,27 @@ def test_score_listing_parses_model_json():
     assert result["match_score"] == 78
     assert result["transmission"] == "manual"
     assert result["ai_unscored"] is False
+
+def test_score_listing_strips_uppercase_json_fence():
+    class FakeBlock:
+        text = '```JSON\n{"match_score": 81, "red_flags": []}\n```'
+    class FakeMsg:
+        content = [FakeBlock()]
+    class FakeClient:
+        class messages:
+            @staticmethod
+            def create(**kwargs):
+                return FakeMsg()
+    result = score_listing(_mk(), client=FakeClient())
+    assert result["match_score"] == 81
+    assert result["ai_unscored"] is False
+
+def test_score_listing_degrades_on_api_exception():
+    class FakeClient:
+        class messages:
+            @staticmethod
+            def create(**kwargs):
+                raise RuntimeError("api down")
+    result = score_listing(_mk(), client=FakeClient())
+    assert result["ai_unscored"] is True
+    assert result["match_score"] == 50

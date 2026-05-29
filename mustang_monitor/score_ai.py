@@ -2,6 +2,7 @@
 from __future__ import annotations
 import json
 import os
+import re
 from mustang_monitor.models import Listing
 
 MODEL = "claude-haiku-4-5-20251001"
@@ -47,9 +48,11 @@ def score_listing(listing: Listing, client) -> dict:
         )
         raw = msg.content[0].text.strip()
         if raw.startswith("```"):
-            raw = raw.strip("`").lstrip("json").strip()
+            # strip an opening ```/```json/```JSON fence and any trailing fence
+            raw = re.sub(r"^```[a-zA-Z]*\n?", "", raw).rstrip("`").strip()
         data = json.loads(raw)
         data["ai_unscored"] = False
         return data
-    except Exception:
+    except Exception as e:
+        print(f"[score_ai] fallback to rules-only: {e}", flush=True)
         return _rules_only()
