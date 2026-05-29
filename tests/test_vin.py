@@ -46,3 +46,8 @@ def test_gt_passes():
     decoded = {"EngineCylinders": "8", "DisplacementL": "4.6", "BodyClass": "Coupe", "Trim": "GT"}
     bad, reasons = vin_disqualifies(decoded, SPEC_VIN)
     assert not bad and reasons == []
+
+def test_unknown_or_empty_fields_pass_through():
+    # junk/unknown VIN -> vPIC returns empty fields -> must NOT disqualify (pipeline relies on this)
+    assert vin_disqualifies({}, SPEC_VIN) == (False, [])
+    assert vin_disqualifies({"EngineCylinders": "", "DisplacementL": "", "BodyClass": "", "Trim": ""}, SPEC_VIN) == (False, [])

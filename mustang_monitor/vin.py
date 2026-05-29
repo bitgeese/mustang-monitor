@@ -13,6 +13,9 @@ def extract_vin(text: str | None) -> str | None:
     return m.group(1) if m else None
 
 def decode_vin(vin: str, timeout: float = 10.0) -> dict:
+    # NOTE: vPIC returns HTTP 200 even for junk VINs (Results[0]["ErrorCode"] != "0"),
+    # leaving the engine/body fields empty. vin_disqualifies then fires nothing and the
+    # listing flows on to the AI scorer — conservatively safe (never a false reject).
     resp = requests.get(_VPIC.format(vin=vin), timeout=timeout)
     resp.raise_for_status()
     results = resp.json().get("Results") or [{}]
