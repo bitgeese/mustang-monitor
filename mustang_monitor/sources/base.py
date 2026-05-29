@@ -4,7 +4,12 @@ from typing import Iterator
 
 
 def run_apify(client, actor_id: str, run_input: dict) -> Iterator[dict]:
-    """Run an Apify actor and yield its dataset items."""
-    run = client.actor(actor_id).call(run_input)
-    dataset_id = run["defaultDatasetId"]
-    yield from client.dataset(dataset_id).iterate_items()
+    """Run an Apify actor and yield its dataset items.
+
+    Matches apify-client 3.x: ActorClient.call is keyword-only and returns a
+    Run pydantic model (or None if the run didn't finish in time).
+    """
+    run = client.actor(actor_id).call(run_input=run_input)
+    if run is None:
+        raise RuntimeError(f"Apify actor {actor_id!r} did not complete")
+    yield from client.dataset(run.default_dataset_id).iterate_items()

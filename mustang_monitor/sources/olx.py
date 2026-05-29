@@ -13,7 +13,7 @@ def map_item(item: dict, fx: dict) -> Listing:
     price_text = f"{item.get('price', '')} {item.get('currency', 'PLN')}"
     return Listing(
         site=SITE,
-        listing_id=str(item.get("id") or item.get("adId")),
+        listing_id=str(item.get("id") or item.get("adId") or item.get("url") or item.get("link") or ""),
         url=item.get("url", "") or item.get("link", ""),
         title=title,
         price_eur=parse_price_eur(price_text, fx),
