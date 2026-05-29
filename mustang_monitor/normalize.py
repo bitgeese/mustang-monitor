@@ -3,6 +3,9 @@ import re
 
 _CURRENCY_HINT = [("zł", "PLN"), ("pln", "PLN"), ("€", "EUR"), ("eur", "EUR"), ("£", "GBP"), ("gbp", "GBP")]
 
+# A numeric token: digits possibly grouped by spaces/dots/commas.
+_PRICE_NUM_RE = re.compile(r"\d[\d .,]*\d|\d")
+
 def _digits(text: str) -> str:
     # keep digits only after stripping thousands separators (space, ., ,)
     return re.sub(r"[^\d]", "", text)
@@ -16,7 +19,13 @@ def parse_price_eur(text: str | None, fx: dict) -> float | None:
         if hint in low:
             currency = code
             break
-    num = _digits(low)
+    m = _PRICE_NUM_RE.search(low)
+    if not m:
+        return None
+    # Drop a trailing decimal/cents group (",50" / ".50") so European decimal-comma
+    # prices like "8.500,50" don't get read as 850050. Band filtering only needs whole euros.
+    token = re.sub(r"[.,]\d{1,2}$", "", m.group(0))
+    num = _digits(token)
     if not num:
         return None
     rate = fx.get(currency, 1.0)

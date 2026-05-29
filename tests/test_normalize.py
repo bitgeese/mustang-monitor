@@ -9,6 +9,17 @@ def test_parse_price_eur_from_eur():
 def test_parse_price_eur_unparseable():
     assert parse_price_eur("ask", {"EUR": 1.0}) is None
 
+def test_parse_price_eur_decimal_comma_cents_dropped():
+    # European decimal-comma must not inflate the price (regression for 850050 bug)
+    assert parse_price_eur("8.500,50 EUR", {"EUR": 1.0}) == 8500.0
+    assert parse_price_eur("39 900,00 zł", {"PLN": 0.23, "EUR": 1.0}) == round(39900 * 0.23, 2)
+    assert parse_price_eur("8,500.50 EUR", {"EUR": 1.0}) == 8500.0
+
+def test_parse_none_inputs():
+    assert parse_price_eur(None, {"EUR": 1.0}) is None
+    assert parse_mileage_km(None) is None
+    assert parse_year(None) is None
+
 def test_parse_mileage_variants():
     assert parse_mileage_km("123 456 km") == 123456
     assert parse_mileage_km("120.000 km") == 120000
