@@ -1,0 +1,41 @@
+years: {min: 1999, max: 2004}
+price_eur: {min: 4000, max: 26000}
+mileage_km: {min: 0, max: 220000}
+fx:
+  PLN: 0.23   # 1 PLN -> EUR
+  GBP: 1.17
+  EUR: 1.0
+keywords:
+  convertible: ["convertible", "cabrio", "kabriolet", "roadster", "cabriolet"]
+  automatic: ["automatic", "automat", "automatik", "tiptronic", " a/t", "automatyczna"]
+  salvage: ["salvage", "powypadkowy", "uszkodzony", "unfallwagen", "rebuilt", "odbudowany", "szkoda całkowita", "do remontu"]
+vin:
+  require_engine_cylinders: 8
+  reject_displacement_below: 4.0     # rejects 3.8L V6
+  reject_body_contains: ["convertible", "cabriolet"]
+  reject_trim_contains: ["cobra", "svt"]
+scoring:
+  min_score_to_alert: 60
+notify:
+  first_run_digest_cap: 15
+sites:
+  otomoto:
+    enabled: true
+    apify_actor: "lexis-solutions/otomoto"   # verify on Apify store before first real run
+    run_input: {searchUrls: ["https://www.otomoto.pl/osobowe/ford/mustang"], maxItems: 60}
+  olx:
+    enabled: true
+    apify_actor: "jungle_synthesizer/poland-olx-classifieds-scraper"
+    run_input: {searchUrls: ["https://www.olx.pl/motoryzacja/samochody/ford-mustang/"], maxItems: 60}
+  mobilede:
+    enabled: true
+    apify_actor: "ivanvs/mobile-de-scraper"
+    run_input: {startUrls: ["https://suchen.mobile.de/fahrzeuge/search.html?makeModelVariant1.makeId=9000&makeModelVariant1.modelId=22"], maxItems: 60}
+  autoscout24:
+    enabled: true
+    apify_actor: "automation-lab/autoscout24-scraper"
+    run_input: {startUrls: ["https://www.autoscout24.de/lst/ford/mustang"], maxItems: 60}
+  willhaben:
+    enabled: false   # best-effort; enable once a working actor is confirmed
+    apify_actor: ""
+    run_input: {}
