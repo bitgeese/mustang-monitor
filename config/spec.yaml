@@ -18,23 +18,40 @@ scoring:
   min_score_to_alert: 60
 notify:
   first_run_digest_cap: 15
+# Cost note: actors below are PAY-PER-RESULT (not rental). Cost roughly:
+#   results_per_run * runs_per_day * 30 * avg_$/1k
+# With 20 results × 4 runs/day × 4 sites = 320/day ≈ 9.6k/mo ≈ $5-15/mo at these actors.
+# Tune `maxResults` and the workflow cron if you want it cheaper / more aggressive.
 sites:
   otomoto:
     enabled: true
-    apify_actor: "lexis-solutions/otomoto"   # verify on Apify store before first real run
-    run_input: {searchUrls: ["https://www.otomoto.pl/osobowe/ford/mustang"], maxItems: 60}
+    apify_actor: "automation-lab/otomoto-scraper"   # PPR, $0.60 / 1k
+    run_input:
+      startUrls:
+        - "https://www.otomoto.pl/osobowe/ford/mustang?search%5Bfilter_float_year%3Afrom%5D=1999&search%5Bfilter_float_year%3Ato%5D=2004"
+      maxResults: 20
   olx:
     enabled: true
-    apify_actor: "jungle_synthesizer/poland-olx-classifieds-scraper"
-    run_input: {searchUrls: ["https://www.olx.pl/motoryzacja/samochody/ford-mustang/"], maxItems: 60}
+    apify_actor: "123webdata/olx-scraper"   # PPR, $5 / 1k (OLX has no year filter — relies on rules gate)
+    run_input:
+      categoryUrls:
+        - "https://www.olx.pl/motoryzacja/samochody/ford-mustang/"
+      maxResultsPerScrape: 20
+      usePagination: false
   mobilede:
     enabled: true
-    apify_actor: "ivanvs/mobile-de-scraper"
-    run_input: {startUrls: ["https://suchen.mobile.de/fahrzeuge/search.html?makeModelVariant1.makeId=9000&makeModelVariant1.modelId=22"], maxItems: 60}
+    apify_actor: "3x1t/mobile-de-scraper-ppr"   # PPR, ~$0.30 / 1k
+    run_input:
+      startUrls:
+        - "https://suchen.mobile.de/fahrzeuge/search.html?makeModelVariant1.makeId=9000&makeModelVariant1.modelId=22&minFirstRegistrationDate=1999-01-01&maxFirstRegistrationDate=2004-12-31"
+      maxItems: 20
   autoscout24:
     enabled: true
-    apify_actor: "automation-lab/autoscout24-scraper"
-    run_input: {startUrls: ["https://www.autoscout24.de/lst/ford/mustang"], maxItems: 60}
+    apify_actor: "3x1t/autoscout24-scraper-ppr"   # PPR, $1.29 / 1k
+    run_input:
+      startUrls:
+        - "https://www.autoscout24.de/lst/ford/mustang?fregfrom=1999&fregto=2004"
+      resultLimitPerThread: 20
   willhaben:
     enabled: false   # best-effort; enable once a working actor is confirmed
     apify_actor: ""

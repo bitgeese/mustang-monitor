@@ -9,10 +9,12 @@ def test_otomoto_map_item():
     raw = json.loads((FIXTURES / "otomoto_item.json").read_text())
     listing = map_item(raw, FX)
     assert listing.site == "otomoto"
-    assert listing.listing_id == "ID6abc"
+    assert listing.listing_id == "6147784510"
     assert listing.year == 2001
     assert listing.mileage_km == 138000
     assert listing.price_eur == round(39900 * 0.23, 2)
+    assert listing.currency == "PLN"
+    assert listing.location == "Warszawa, Mazowieckie"
     assert listing.vin == "1FAFP42X11F123456"
     assert listing.photos == ["https://img.otomoto/1.jpg", "https://img.otomoto/2.jpg"]
 
