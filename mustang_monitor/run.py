@@ -92,9 +92,11 @@ def main(argv=None) -> int:
         try:
             listings = _gather(site, spec, apify_client)
         except Exception as e:  # isolate per-site failure
+            print(f"[run] {site} fetch failed: {type(e).__name__}: {e}", flush=True)
             if not args.dry_run and token:
                 notify.send_text(f"⚠️ {site} fetch failed: {e}", token, chat_id)
             continue
+        print(f"[run] {site}: gathered {len(listings)} listings", flush=True)
         for listing in listings:
             decision = process_listing(listing, spec, conn, vin_decoder=decode_vin, scorer=scorer)
             if decision["action"] == "alert" and not args.backfill_silent:
