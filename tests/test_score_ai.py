@@ -49,6 +49,21 @@ def test_score_listing_strips_uppercase_json_fence():
     assert result["match_score"] == 81
     assert result["ai_unscored"] is False
 
+def test_score_listing_parses_json_with_trailing_prose():
+    # regression for live Haiku output: valid JSON followed by trailing commentary
+    class FakeBlock:
+        text = '{"match_score": 73, "red_flags": [], "recommendation": "inspect"}\n\nHere are my notes: looks promising.'
+    class FakeMsg:
+        content = [FakeBlock()]
+    class FakeClient:
+        class messages:
+            @staticmethod
+            def create(**kwargs):
+                return FakeMsg()
+    result = score_listing(_mk(), client=FakeClient())
+    assert result["match_score"] == 73
+    assert result["ai_unscored"] is False
+
 def test_score_listing_degrades_on_api_exception():
     class FakeClient:
         class messages:

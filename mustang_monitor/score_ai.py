@@ -50,7 +50,12 @@ def score_listing(listing: Listing, client) -> dict:
         if raw.startswith("```"):
             # strip an opening ```/```json/```JSON fence and any trailing fence
             raw = re.sub(r"^```[a-zA-Z]*\n?", "", raw).rstrip("`").strip()
-        data = json.loads(raw)
+        # Use raw_decode so trailing prose after the JSON object doesn't break parsing
+        # (Haiku frequently emits {...} followed by a couple of lines of commentary).
+        start = raw.find("{")
+        if start < 0:
+            raise ValueError("no JSON object in model output")
+        data, _ = json.JSONDecoder().raw_decode(raw[start:])
         data["ai_unscored"] = False
         return data
     except Exception as e:
