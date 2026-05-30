@@ -1,13 +1,14 @@
 import json
 from pathlib import Path
-from mustang_monitor.sources.otomoto import map_item
+from mustang_monitor.sources.otomoto import map_item as otomoto_map
+from mustang_monitor.sources.mobilede import map_item as mobilede_map
 
 FX = {"PLN": 0.23, "EUR": 1.0}
 FIXTURES = Path(__file__).parent / "fixtures"
 
 def test_otomoto_map_item():
     raw = json.loads((FIXTURES / "otomoto_item.json").read_text())
-    listing = map_item(raw, FX)
+    listing = otomoto_map(raw, FX)
     assert listing.site == "otomoto"
     assert listing.listing_id == "6147784510"
     assert listing.year == 2001
@@ -16,7 +17,24 @@ def test_otomoto_map_item():
     assert listing.currency == "PLN"
     assert listing.location == "Warszawa, Mazowieckie"
     assert listing.vin == "1FAFP42X11F123456"
-    assert listing.photos == ["https://img.otomoto/1.jpg", "https://img.otomoto/2.jpg"]
+    assert listing.photos == ["https://img.otomoto/1.jpg"]
+    assert listing.transmission == "manual"
+    assert "Gearbox: Manualna" in listing.description
+    assert "Trim: GT" in listing.description
+
+def test_mobilede_map_item():
+    raw = json.loads((FIXTURES / "mobilede_item.json").read_text())
+    listing = mobilede_map(raw, FX)
+    assert listing.site == "mobilede"
+    assert listing.listing_id == "456657552"
+    assert listing.year == 2001
+    assert listing.mileage_km == 138000
+    assert listing.price_eur == 9180.0
+    assert listing.currency == "EUR"
+    assert listing.transmission == "manual"
+    assert "Category: Sports Car/Coupe" in listing.description
+    assert listing.vin == "1FAFP42X11F123456"
+    assert listing.photos[0] == "https://img.classistatic.de/1.jpg"
 
 # Fakes mirror the real apify-client 3.x interface: keyword-only `call(run_input=...)`
 # returning a Run-like object with `.default_dataset_id` (or None on timeout).

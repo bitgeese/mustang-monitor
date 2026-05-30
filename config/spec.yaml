@@ -31,8 +31,12 @@ sites:
         - "https://www.otomoto.pl/osobowe/ford/mustang?search%5Bfilter_float_year%3Afrom%5D=1999&search%5Bfilter_float_year%3Ato%5D=2004"
       maxResults: 20
   olx:
-    enabled: true
-    apify_actor: "123webdata/olx-scraper"   # PPR, $5 / 1k (OLX has no year filter — relies on rules gate)
+    # DISABLED 2026-05-30: actor returns "Forbidden — requires full account access".
+    # The Apify token was created with limited scope. To enable: in Apify Console
+    # create a NEW token with full access (Integrations → API → Create new token →
+    # set permissions to "All actor permissions"), then update GH secret APIFY_TOKEN.
+    enabled: false
+    apify_actor: "123webdata/olx-scraper"   # PPR, $5 / 1k
     run_input:
       categoryUrls:
         - "https://www.olx.pl/motoryzacja/samochody/ford-mustang/"
@@ -41,12 +45,15 @@ sites:
   mobilede:
     enabled: true
     apify_actor: "3x1t/mobile-de-scraper-ppr"   # PPR, ~$0.30 / 1k
+    # Use the actor's structured inputs (the make/model URL IDs are not Ford Mustang's).
     run_input:
-      startUrls:
-        - "https://suchen.mobile.de/fahrzeuge/search.html?makeModelVariant1.makeId=9000&makeModelVariant1.modelId=22&minFirstRegistrationDate=1999-01-01&maxFirstRegistrationDate=2004-12-31"
+      searchTerms: ["Ford Mustang"]
+      registrationDateYearMin: 1999
+      registrationDateYearMax: 2004
       maxItems: 20
   autoscout24:
-    enabled: true
+    # DISABLED 2026-05-30: same Forbidden error as OLX — needs full-access Apify token.
+    enabled: false
     apify_actor: "3x1t/autoscout24-scraper-ppr"   # PPR, $1.29 / 1k
     run_input:
       startUrls:

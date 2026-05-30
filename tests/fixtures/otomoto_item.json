@@ -1,15 +1,23 @@
 {
   "id": "6147784510",
   "url": "https://www.otomoto.pl/osobowe/oferta/ford-mustang-gt-6147784510.html",
-  "title": "Ford Mustang GT 4.6 V8 Manual",
+  "title": "Ford Mustang GT 4.6 V8",
+  "shortDescription": "Skrzynia manualna, coupe, VIN 1FAFP42X11F123456",
+  "make": "Ford",
+  "model": "Mustang",
+  "version": "GT",
   "year": 2001,
   "mileageKm": 138000,
+  "fuelType": "Benzyna",
+  "gearbox": "Manualna",
+  "engineCapacityCc": 4601,
+  "enginePowerHp": 260,
   "pricePLN": 39900,
+  "priceCurrency": "PLN",
   "city": "Warszawa",
   "region": "Mazowieckie",
-  "description": "Skrzynia manualna, coupe, VIN 1FAFP42X11F123456",
-  "images": [
-    "https://img.otomoto/1.jpg",
-    "https://img.otomoto/2.jpg"
-  ]
+  "badges": [],
+  "sellerType": "PrivateSeller",
+  "thumbnailUrl": "https://img.otomoto/1.jpg",
+  "createdAt": "2026-05-01T10:00:00Z"
 }

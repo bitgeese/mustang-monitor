@@ -1,0 +1,33 @@
+{
+  "id": 456657552,
+  "url": "https://suchen.mobile.de/fahrzeuge/details.html?id=456657552",
+  "title": "Ford Mustang GT 4.6 V8 Manual",
+  "description": "Ford Mustang GT in sehr gutem Zustand. Manuelles Getriebe. VIN 1FAFP42X11F123456.",
+  "brand": "Ford",
+  "model": "Mustang",
+  "previewImage": "https://img.classistatic.de/preview.jpg",
+  "images": [
+    "https://img.classistatic.de/1.jpg",
+    "https://img.classistatic.de/2.jpg"
+  ],
+  "price": {
+    "total": {
+      "amount": 9180,
+      "currency": "EUR",
+      "localized": "€9,180"
+    },
+    "type": "FIXED"
+  },
+  "attributes": {
+    "First Registration": "06/2001",
+    "Mileage": "138,000 km",
+    "Transmission": "Manual",
+    "Category": "Sports Car/Coupe",
+    "Cubic Capacity": "4,601 ccm",
+    "Cylinders": "8",
+    "Fuel": "Petrol"
+  },
+  "dealerDetails": {
+    "address": "Auf Bowert 19, DE-54340 Bekond"
+  }
+}
