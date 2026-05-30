@@ -18,10 +18,10 @@ scoring:
   min_score_to_alert: 60
 notify:
   first_run_digest_cap: 15
-# Cost note: actors below are PAY-PER-RESULT (not rental). Cost roughly:
-#   results_per_run * runs_per_day * 30 * avg_$/1k
-# With 20 results × 4 runs/day × 4 sites = 320/day ≈ 9.6k/mo ≈ $5-15/mo at these actors.
-# Tune `maxResults` and the workflow cron if you want it cheaper / more aggressive.
+# Cost note: actors below are PAY-PER-RESULT. With the workflow on a WEEKLY cron
+# (4-5 runs/mo) × ~20 results × 4 sites ≈ 320-400 results/mo, costing well under
+# $1/mo at these actors. Tune `maxResults`/`maxItems` or the cron if you want it
+# more aggressive.
 sites:
   otomoto:
     enabled: true
@@ -31,12 +31,8 @@ sites:
         - "https://www.otomoto.pl/osobowe/ford/mustang?search%5Bfilter_float_year%3Afrom%5D=1999&search%5Bfilter_float_year%3Ato%5D=2004"
       maxResults: 20
   olx:
-    # DISABLED 2026-05-30: actor returns "Forbidden — requires full account access".
-    # The Apify token was created with limited scope. To enable: in Apify Console
-    # create a NEW token with full access (Integrations → API → Create new token →
-    # set permissions to "All actor permissions"), then update GH secret APIFY_TOKEN.
-    enabled: false
-    apify_actor: "123webdata/olx-scraper"   # PPR, $5 / 1k
+    enabled: true
+    apify_actor: "123webdata/olx-scraper"   # PPR, $5 / 1k — pre-approved via Apify Console 2026-05-30
     run_input:
       categoryUrls:
         - "https://www.olx.pl/motoryzacja/samochody/ford-mustang/"
@@ -52,9 +48,8 @@ sites:
       registrationDateYearMax: 2004
       maxItems: 20
   autoscout24:
-    # DISABLED 2026-05-30: same Forbidden error as OLX — needs full-access Apify token.
-    enabled: false
-    apify_actor: "3x1t/autoscout24-scraper-ppr"   # PPR, $1.29 / 1k
+    enabled: true
+    apify_actor: "3x1t/autoscout24-scraper-ppr"   # PPR, $1.29 / 1k — pre-approved via Apify Console 2026-05-30
     run_input:
       startUrls:
         - "https://www.autoscout24.de/lst/ford/mustang?fregfrom=1999&fregto=2004"

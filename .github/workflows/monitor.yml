@@ -1,7 +1,7 @@
 name: mustang-monitor
 on:
   schedule:
-    - cron: "0 */4 * * *"   # every 4h (6 runs/day) — keeps PPR-actor cost in low $/mo
+    - cron: "0 9 * * 1"   # weekly: every Monday at 09:00 UTC (18:00 KST) — slow market, cheap
   workflow_dispatch: {}
 
 permissions:
