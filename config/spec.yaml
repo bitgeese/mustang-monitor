@@ -34,8 +34,9 @@ sites:
     enabled: true
     apify_actor: "123webdata/olx-scraper"   # PPR, $5 / 1k — pre-approved via Apify Console 2026-05-30
     run_input:
+      # `/ford-mustang/` category 404s; the search form works.
       categoryUrls:
-        - "https://www.olx.pl/motoryzacja/samochody/ford-mustang/"
+        - "https://www.olx.pl/motoryzacja/samochody/q-ford-mustang/"
       maxResultsPerScrape: 20
       usePagination: false
   mobilede:
